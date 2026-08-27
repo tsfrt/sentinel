@@ -1,36 +1,73 @@
-Hero Question:
-"Should we hold, release, or investigate Payment PAY-0000214 — a $1,850 Child Care
-disbursement flagged by the cross-agency fraud match with duplicate identity signals —
-before it goes out the door today?"
+HERO QUESTION
+=============
 
-Decision Type: Pre-disbursement disposition (surface → prescribe → approve → act)
+"Walk me through the full decision chain for payment PAY-0000214 — from the moment
+it was scored to the final committed disposition. Show every linked record."
 
-Answer (not a lookup, not a dashboard — a DECISION):
-HOLD FOR VERIFICATION, 48 HOURS. The dual signals (cross_agency_fraud_flag at 97%
-confidence + duplicate_identity) justify pausing disbursement while identity documents
-are validated. Net value of hold vs. release: +$917. Approved by Deputy Commissioner.
+DECISION CHAIN (linked record IDs)
+-----------------------------------
 
-Linked Record IDs forming the decision chain:
+1. TRIGGER SCORED
+   - Payment: PAY-0000214
+   - Case: CASE-00000041
+   - Beneficiary: BEN-0000173
+   - Program: Child Care
+   - Amount: $1,850.00
+   - Signals: cross_agency_fraud_flag, duplicate_identity
+   - Event: 193e8a75-3f90-4180-b7c7-0b04ee59200a (workflow_state)
+   - Timestamp: 2026-08-27T18:08:19.271Z
 
-  Case:        CASE-00000041
-  Payment:     PAY-0000214
-  Beneficiary: BEN-0000173
-  Action:      act-hero-001 (sentinel.examiner_actions)
+2. QUEUE VIEW OPENED
+   - Actor: della.okonkwo@sentinel.gov
+   - View: pre_disbursement_queue (sorted by exposure DESC, filtered high risk)
+   - Event: 417fc76c-dfe2-42b2-bff7-d31a263d918a (workflow_state)
+   - Timestamp: 2026-08-27T19:15:00Z
 
-  Trigger event:     193e8a75-... (sentinel.workflow_state, event_type=trigger_scored)
-  View opened:       417fc76c-... (sentinel.workflow_state, event_type=view_opened)
-  Assist explain:    beb14423-... (sentinel.workflow_state, event_type=assist_query)
-  Assist what-if:    bdd07737-... (sentinel.workflow_state, event_type=assist_query)
-  Action proposed:   2e32f5c2-... (sentinel.workflow_state, event_type=action_proposed)
-  Action approved:   9e41eaee-... (sentinel.workflow_state, event_type=action_approved)
-  Action committed:  bc76705a-... (sentinel.workflow_state, event_type=action_committed)
-  Decision closed:   3e64bcd8-... (sentinel.workflow_state, event_type=decision_recorded)
+3. ASSIST: EXPLAIN FLAG (find_flag tool)
+   - Actor: della.okonkwo@sentinel.gov
+   - Query: "Why is PAY-0000214 flagged and what should we do?"
+   - Event: beb14423-2392-47aa-95e0-84687bf36c9a (workflow_state)
+   - Timestamp: 2026-08-27T19:16:30Z
 
-  SLA tracking:      sentinel.sla_tracking (CASE-00000041, first_review, 4h deadline)
-  ML recommendation: sentinel.disposition_recommendations (PAY-0000214, hold_for_verification)
-  Synced UC table:   sentinel.synced_gold_open_queue (read-only mirror from lanl.sentinel.gold_open_queue)
+4. ASSIST: WHAT-IF ANALYSIS (rank_dispositions tool)
+   - Actor: della.okonkwo@sentinel.gov
+   - Query: "What if we release it instead of holding?"
+   - Event: bdd07737-dc05-4a29-9766-c067080f1f56 (workflow_state)
+   - Timestamp: 2026-08-27T19:18:00Z
 
-Closed Loop Evidence:
-  The committed disposition (hold_for_verification) is reflected in the next read of
-  the live queue view — the action_status column shows 'approved' for CASE-00000041,
-  proving the write-back is visible on the next query cycle.
+5. ACTION PROPOSED
+   - Proposed: hold_for_verification (48h)
+   - Confidence: 95%
+   - Predicted recovery: $962.00
+   - Event: 2e32f5c2-0b35-4c1e-8e4f-17b6da8f66a5 (workflow_state)
+   - Timestamp: 2026-08-27T19:19:00Z
+
+6. ACTION APPROVED
+   - Approver: della.okonkwo@sentinel.gov
+   - Rationale: "Approve hold - dual signals justify 48h verification window"
+   - Event: 9e41eaee-8f0d-472f-95f5-2d7115ff1c8a (workflow_state)
+   - Action record: act-hero-001 (examiner_actions)
+   - Timestamp: 2026-08-27T19:20:00Z
+
+7. ACTION COMMITTED
+   - Action ID: act-hero-001
+   - Disposition: hold_for_verification
+   - Event: bc76705a-dbcc-4125-b318-e7333ebd5df6 (workflow_state)
+   - Timestamp: 2026-08-27T19:20:05Z
+
+8. DECISION RECORDED (closed loop)
+   - Final disposition: hold_for_verification
+   - Recovery: $962.00
+   - Closed loop: true
+   - Event: 3e64bcd8-b052-4a5c-b1c6-3fe641d95946 (workflow_state)
+   - Timestamp: 2026-08-27T19:20:10Z
+
+CROSS-REFERENCE MAP
+-------------------
+- sentinel.cases: CASE-00000041
+- sentinel.examiner_actions: act-hero-001
+- sentinel.workflow_state: 8 events (193e8a75...through 3e64bcd8...)
+- sentinel.disposition_recommendations: PAY-0000214
+- sentinel.synced_gold_open_queue: PAY-0000214 (source: lanl.sentinel.gold_open_queue)
+- Beneficiary: BEN-0000173
+- Examiner: della.okonkwo@sentinel.gov
