@@ -1,0 +1,23 @@
+* 78320d0 (HEAD -> dev, origin/dev) feat(build2-submission): add submission2 exports with full decision chain evidence
+* 1547b45 feat(build2-layer1): implement find_flag + rank_dispositions + execute_case_action tools
+* 892a4f4 (origin/main, origin/HEAD, main) feat: initial commit — Sentinel Payment Integrity platform
+
+# Branch structure:
+#   main  → clean baseline (Build 1: Sentinel platform + Lakebase + synced tables)
+#   dev   → Build 2 development (off main):
+#     1547b45: Layer 1+2+3 tool implementations
+#       - Implemented find_flag (reads open flags from Lakebase)
+#       - Implemented rank_dispositions (reads ML recommendations)
+#       - Implemented execute_case_action (writes approved disposition)
+#       - Created sentinel.examiner_actions table (writable, REPLICA IDENTITY FULL)
+#       - Created sentinel.workflow_state table (observability, REPLICA IDENTITY FULL)
+#       Co-authored-by: Genie Code <genie-code@databricks.com>
+#     78320d0: Submission evidence
+#       - writeback_table.json, state_table.json, view_query.sql, view_result.json
+#       - assist_log.jsonl, drafted_sample.md, hero_question.txt
+#
+# The dev branch builds progressively on top of main:
+#   main has the platform (cases, case_events, disposition_recommendations,
+#   sla_tracking, synced_gold_open_queue).
+#   dev adds the operational write layer (examiner_actions, workflow_state)
+#   and implements the three agent tools that power the action-taking app.
