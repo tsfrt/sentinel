@@ -1,12 +1,102 @@
 [
-  {"case_id": "CASE-00000034", "payment_id": "PAY-0000854", "program": "SNAP", "risk_level": "high", "payment_amount_usd": 2148.92, "recommended_disposition": "hold_for_verification", "relevance_score": 0.4758, "reasoning_excerpt": "High-risk: 2 fraud signal(s) on $2149.0 SNAP payment. Two signals justify verification hold before disbursement."},
-  {"case_id": "CASE-00000036", "payment_id": "PAY-0000927", "program": "Disability", "risk_level": "high", "payment_amount_usd": 1995.46, "recommended_disposition": "hold_for_verification", "relevance_score": 0.4758, "reasoning_excerpt": "High-risk: 2 fraud signal(s) on $1995.0 Disability payment. Two signals justify verification hold before disbursement."},
-  {"case_id": "CASE-00000031", "payment_id": "PAY-0000840", "program": "Disability", "risk_level": "high", "payment_amount_usd": 2363.98, "recommended_disposition": "hold_for_verification", "relevance_score": 0.4758, "reasoning_excerpt": "High-risk: 2 fraud signal(s) on $2364.0 Disability payment. Two signals justify verification hold before disbursement."},
-  {"case_id": "CASE-00000003", "payment_id": "PAY-0000301", "program": "SNAP", "risk_level": "high", "payment_amount_usd": 3349.66, "recommended_disposition": "hold_for_verification", "relevance_score": 0.4758, "reasoning_excerpt": "High-risk: 2 fraud signal(s) on $3350.0 SNAP payment. Two signals justify verification hold before disbursement."},
-  {"case_id": "CASE-00000035", "payment_id": "PAY-0000236", "program": "Disability", "risk_level": "high", "payment_amount_usd": 2090.49, "recommended_disposition": "hold_for_verification", "relevance_score": 0.4758, "reasoning_excerpt": "High-risk: 2 fraud signal(s) on $2090.0 Disability payment. Two signals justify verification hold before disbursement."},
-  {"case_id": "CASE-00000012", "payment_id": "PAY-0000029", "program": "TANF", "risk_level": "high", "payment_amount_usd": 3026.24, "recommended_disposition": "hold_for_verification", "relevance_score": 0.4758, "reasoning_excerpt": "High-risk: 2 fraud signal(s) on $3026.0 TANF payment. Two signals justify verification hold before disbursement."},
-  {"case_id": "CASE-00000016", "payment_id": "PAY-0000520", "program": "TANF", "risk_level": "high", "payment_amount_usd": 2842.20, "recommended_disposition": "hold_for_verification", "relevance_score": 0.4758, "reasoning_excerpt": "High-risk: 2 fraud signal(s) on $2842.0 TANF payment. Two signals justify verification hold before disbursement."},
-  {"case_id": "CASE-00000006", "payment_id": "PAY-0000199", "program": "Disability", "risk_level": "high", "payment_amount_usd": 3227.37, "recommended_disposition": "hold_for_verification", "relevance_score": 0.4758, "reasoning_excerpt": "High-risk: 2 fraud signal(s) on $3227.0 Disability payment. Two signals justify verification hold before disbursement."},
-  {"case_id": "CASE-00000030", "payment_id": "PAY-0000145", "program": "TANF", "risk_level": "high", "payment_amount_usd": 2420.32, "recommended_disposition": "hold_for_verification", "relevance_score": 0.4758, "reasoning_excerpt": "High-risk: 2 fraud signal(s) on $2420.0 TANF payment. Two signals justify verification hold before disbursement."},
-  {"case_id": "CASE-00000038", "payment_id": "PAY-0000444", "program": "SNAP", "risk_level": "high", "payment_amount_usd": 1982.50, "recommended_disposition": "hold_for_verification", "relevance_score": 0.4758, "reasoning_excerpt": "High-risk: 2 fraud signal(s) on $1983.0 SNAP payment. Two signals justify verification hold before disbursement."}
+  {
+    "case_id": "CASE-00000031",
+    "payment_id": "PAY-0000840",
+    "program": "Disability",
+    "risk_level": "high",
+    "payment_amount_usd": 2363.98,
+    "recommended_disposition": "hold_for_verification",
+    "relevance_score": 0.4758,
+    "reasoning_excerpt": "High-risk: 2 fraud signal(s) on $2364.0 Disability payment. Two signals justify verification hold before disbursement."
+  },
+  {
+    "case_id": "CASE-00000035",
+    "payment_id": "PAY-0000236",
+    "program": "Disability",
+    "risk_level": "high",
+    "payment_amount_usd": 2090.49,
+    "recommended_disposition": "hold_for_verification",
+    "relevance_score": 0.4758,
+    "reasoning_excerpt": "High-risk: 2 fraud signal(s) on $2090.0 Disability payment. Two signals justify verification hold before disbursement."
+  },
+  {
+    "case_id": "CASE-00000024",
+    "payment_id": "PAY-0000264",
+    "program": "TANF",
+    "risk_level": "high",
+    "payment_amount_usd": 2577.68,
+    "recommended_disposition": "hold_for_verification",
+    "relevance_score": 0.4758,
+    "reasoning_excerpt": "High-risk: 2 fraud signal(s) on $2578.0 TANF payment. Two signals justify verification hold before disbursement."
+  },
+  {
+    "case_id": "CASE-00000030",
+    "payment_id": "PAY-0000145",
+    "program": "TANF",
+    "risk_level": "high",
+    "payment_amount_usd": 2420.32,
+    "recommended_disposition": "hold_for_verification",
+    "relevance_score": 0.4758,
+    "reasoning_excerpt": "High-risk: 2 fraud signal(s) on $2420.0 TANF payment. Two signals justify verification hold before disbursement."
+  },
+  {
+    "case_id": "CASE-00000034",
+    "payment_id": "PAY-0000854",
+    "program": "SNAP",
+    "risk_level": "high",
+    "payment_amount_usd": 2148.92,
+    "recommended_disposition": "hold_for_verification",
+    "relevance_score": 0.4758,
+    "reasoning_excerpt": "High-risk: 2 fraud signal(s) on $2149.0 SNAP payment. Two signals justify verification hold before disbursement."
+  },
+  {
+    "case_id": "CASE-00000012",
+    "payment_id": "PAY-0000029",
+    "program": "TANF",
+    "risk_level": "high",
+    "payment_amount_usd": 3026.24,
+    "recommended_disposition": "hold_for_verification",
+    "relevance_score": 0.4758,
+    "reasoning_excerpt": "High-risk: 2 fraud signal(s) on $3026.0 TANF payment. Two signals justify verification hold before disbursement."
+  },
+  {
+    "case_id": "CASE-00000006",
+    "payment_id": "PAY-0000199",
+    "program": "Disability",
+    "risk_level": "high",
+    "payment_amount_usd": 3227.37,
+    "recommended_disposition": "hold_for_verification",
+    "relevance_score": 0.4758,
+    "reasoning_excerpt": "High-risk: 2 fraud signal(s) on $3227.0 Disability payment. Two signals justify verification hold before disbursement."
+  },
+  {
+    "case_id": "CASE-00000016",
+    "payment_id": "PAY-0000520",
+    "program": "TANF",
+    "risk_level": "high",
+    "payment_amount_usd": 2842.2,
+    "recommended_disposition": "hold_for_verification",
+    "relevance_score": 0.4758,
+    "reasoning_excerpt": "High-risk: 2 fraud signal(s) on $2842.0 TANF payment. Two signals justify verification hold before disbursement."
+  },
+  {
+    "case_id": "CASE-00000003",
+    "payment_id": "PAY-0000301",
+    "program": "SNAP",
+    "risk_level": "high",
+    "payment_amount_usd": 3349.66,
+    "recommended_disposition": "hold_for_verification",
+    "relevance_score": 0.4758,
+    "reasoning_excerpt": "High-risk: 2 fraud signal(s) on $3350.0 SNAP payment. Two signals justify verification hold before disbursement."
+  },
+  {
+    "case_id": "CASE-00000036",
+    "payment_id": "PAY-0000927",
+    "program": "Disability",
+    "risk_level": "high",
+    "payment_amount_usd": 1995.46,
+    "recommended_disposition": "hold_for_verification",
+    "relevance_score": 0.4758,
+    "reasoning_excerpt": "High-risk: 2 fraud signal(s) on $1995.0 Disability payment. Two signals justify verification hold before disbursement."
+  }
 ]

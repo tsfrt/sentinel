@@ -14,7 +14,9 @@
 #      scripts/build-app.sh and dist/ ships via DAB sync.include).
 #   3. The `command:` below starts the server.
 
-command: ['node', '--env-file-if-exists=.env', 'dist/server.js']
+command:
+  - python
+  - app.py
 
 # Scopes minted into the user's OBO token (x-forwarded-access-token).
 user_authorization:
@@ -44,3 +46,5 @@ env:
   # placeholder resolution.
   - name: WAREHOUSE_ID
     valueFrom: sql-warehouse
+  - name: POSTGRES_ENDPOINT
+    value: projects/sentinel-payments/branches/dev/endpoints/primary

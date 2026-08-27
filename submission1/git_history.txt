@@ -1,5 +1,7 @@
-# Lakebase Branch History (analogous to git log --graph --oneline --decorate --all)
-#
+# git log --graph --oneline --decorate --all
+* 892a4f4 (HEAD -> main, origin/main, origin/HEAD, dev) feat: initial commit — Sentinel Payment Integrity platform
+
+# Lakebase Branch History (database-level branching, analogous to git)
 # Lakebase uses copy-on-write branching (similar to git) for schema iteration.
 # The 'production' branch = main; 'dev' branch = feature branch.
 # Changes were developed on dev, validated, then promoted (applied) to production.
