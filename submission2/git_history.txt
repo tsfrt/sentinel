@@ -1,5 +1,6 @@
-* 9262feb (HEAD -> dev, origin/dev) feat(app): redesign Gradio UI + fix Lakebase credential generation
+* 4b86312 (HEAD -> dev, origin/dev) docs(build2): refresh submission2 exports with live Lakebase data
+* 9262feb feat(app): redesign Gradio UI + fix Lakebase credential generation
 * 05a091c docs(build2): add git_history.txt to submission2
 * 78320d0 feat(build2-submission): add submission2 exports with full decision chain evidence
 * 1547b45 feat(build2-layer1): implement find_flag + rank_dispositions + execute_case_action tools
-* 892a4f4 (origin/main, origin/HEAD, main) feat: initial commit - Sentinel Payment Integrity platform
+* 892a4f4 (origin/main, origin/HEAD, main) feat: initial commit -- Sentinel Payment Integrity platform

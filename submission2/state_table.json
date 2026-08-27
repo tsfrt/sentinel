@@ -112,5 +112,33 @@
       "final_disposition": "hold_for_verification"
     },
     "recorded_at": "2026-08-27T19:20:10.000Z"
+  },
+  {
+    "event_id": "feb5bf71-9b11-4643-9f4b-a86ba9780101",
+    "event_type": "action_committed",
+    "case_id": "CASE-00000005",
+    "action_id": "act-17404f30",
+    "actor": "examiner@sentinel.gov",
+    "payload": {
+      "action": "hold_for_verification",
+      "action_id": "act-17404f30",
+      "committed": true,
+      "payment_id": "PAY-0000945"
+    },
+    "recorded_at": "2026-08-27T20:54:26.051Z"
+  },
+  {
+    "event_id": "48f2a85f-c35e-4e58-b843-135d633d044e",
+    "event_type": "action_committed",
+    "case_id": "CASE-00000015",
+    "action_id": "act-ae80a1bc",
+    "actor": "examiner@sentinel.gov",
+    "payload": {
+      "action": "refer_to_investigation",
+      "action_id": "act-ae80a1bc",
+      "committed": true,
+      "payment_id": "PAY-0000967"
+    },
+    "recorded_at": "2026-08-27T20:54:59.339Z"
   }
 ]

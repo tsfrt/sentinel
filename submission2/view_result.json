@@ -61,8 +61,8 @@
     "improper_payment_exposure_usd": 2659.86,
     "projected_recovery_usd": 1728.91,
     "recommended_disposition": "hold_for_verification",
-    "action_status": null,
-    "proposed_action": null
+    "action_status": "approved",
+    "proposed_action": "hold_for_verification"
   },
   {
     "case_id": "CASE-00000006",
@@ -191,7 +191,7 @@
     "improper_payment_exposure_usd": 2338.19,
     "projected_recovery_usd": 1519.82,
     "recommended_disposition": "refer_to_investigation",
-    "action_status": null,
-    "proposed_action": null
+    "action_status": "approved",
+    "proposed_action": "refer_to_investigation"
   }
 ]

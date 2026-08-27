@@ -1,7 +1,7 @@
 HERO QUESTION
 =============
 
-"Walk me through the full decision chain for payment PAY-0000214 — from the moment
+"Walk me through the full decision chain for payment PAY-0000214 -- from the moment
 it was scored to the final committed disposition. Show every linked record."
 
 DECISION CHAIN (linked record IDs)
@@ -44,7 +44,7 @@ DECISION CHAIN (linked record IDs)
 
 6. ACTION APPROVED
    - Approver: della.okonkwo@sentinel.gov
-   - Rationale: "Approve hold - dual signals justify 48h verification window"
+   - Rationale: "Approve hold -- dual signals justify 48h verification window"
    - Event: 9e41eaee-8f0d-472f-95f5-2d7115ff1c8a (workflow_state)
    - Action record: act-hero-001 (examiner_actions)
    - Timestamp: 2026-08-27T19:20:00Z
@@ -62,12 +62,27 @@ DECISION CHAIN (linked record IDs)
    - Event: 3e64bcd8-b052-4a5c-b1c6-3fe641d95946 (workflow_state)
    - Timestamp: 2026-08-27T19:20:10Z
 
+ADDITIONAL LIVE TRANSACTIONS (app-generated)
+--------------------------------------------
+
+9. PAY-0000945 HOLD COMMITTED (via app UI)
+   - Case: CASE-00000005
+   - Action: act-17404f30
+   - Event: feb5bf71-9b11-4643-9f4b-a86ba9780101 (workflow_state)
+   - Timestamp: 2026-08-27T20:54:26.051Z
+
+10. PAY-0000967 REFERRAL COMMITTED (via app UI)
+    - Case: CASE-00000015
+    - Action: act-ae80a1bc
+    - Event: 48f2a85f-c35e-4e58-b843-135d633d044e (workflow_state)
+    - Timestamp: 2026-08-27T20:54:59.339Z
+
 CROSS-REFERENCE MAP
 -------------------
-- sentinel.cases: CASE-00000041
-- sentinel.examiner_actions: act-hero-001
-- sentinel.workflow_state: 8 events (193e8a75...through 3e64bcd8...)
+- sentinel.cases: CASE-00000041, CASE-00000005, CASE-00000015
+- sentinel.examiner_actions: act-hero-001, act-17404f30, act-ae80a1bc
+- sentinel.workflow_state: 10 events (193e8a75...through 48f2a85f...)
 - sentinel.disposition_recommendations: PAY-0000214
 - sentinel.synced_gold_open_queue: PAY-0000214 (source: lanl.sentinel.gold_open_queue)
 - Beneficiary: BEN-0000173
-- Examiner: della.okonkwo@sentinel.gov
+- Examiner: della.okonkwo@sentinel.gov, examiner@sentinel.gov

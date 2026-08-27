@@ -46,5 +46,37 @@
     "confidence_score": 0.85,
     "exposure_usd": 2679.73,
     "recovery_usd": 1741.82
+  },
+  {
+    "action_id": "act-17404f30",
+    "case_id": "CASE-00000005",
+    "payment_id": "PAY-0000945",
+    "proposed_action": "hold_for_verification",
+    "proposed_by": "system",
+    "proposed_at": "2026-08-27T20:54:24.911Z",
+    "approval_status": "approved",
+    "approved_by": "examiner@sentinel.gov",
+    "approved_at": "2026-08-27T20:54:24.911Z",
+    "committed_at": "2026-08-27T20:54:24.911Z",
+    "rationale": "AI",
+    "confidence_score": 0.95,
+    "exposure_usd": 2659.86,
+    "recovery_usd": 1728.91
+  },
+  {
+    "action_id": "act-ae80a1bc",
+    "case_id": "CASE-00000015",
+    "payment_id": "PAY-0000967",
+    "proposed_action": "refer_to_investigation",
+    "proposed_by": "system",
+    "proposed_at": "2026-08-27T20:54:58.308Z",
+    "approval_status": "approved",
+    "approved_by": "examiner@sentinel.gov",
+    "approved_at": "2026-08-27T20:54:58.308Z",
+    "committed_at": "2026-08-27T20:54:58.308Z",
+    "rationale": "AI",
+    "confidence_score": 0.95,
+    "exposure_usd": 2338.19,
+    "recovery_usd": 1519.82
   }
 ]
