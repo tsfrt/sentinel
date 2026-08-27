@@ -1,0 +1,10 @@
+Business Question:
+"Which benefit programs have the highest improper-payment exposure among flagged payments,
+and what is the projected recovery if those payments are investigated rather than released?"
+
+Context:
+The Sentinel agency needs to prioritize investigative resources across five benefit programs
+(TANF, SNAP, Child Care, Disability, Veteran's). This query uses the synced UC table
+(gold_open_queue, synced into Lakebase as sentinel.synced_gold_open_queue) to rank programs
+by total exposure and projected recovery, helping the Deputy Commissioner allocate examiner
+capacity where the return on investigation is highest.

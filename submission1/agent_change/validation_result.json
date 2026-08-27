@@ -1,0 +1,17 @@
+{
+  "description": "Validation query result after promoting 001_add_sla_tracking.sql to production",
+  "query": "SELECT sla_type, COUNT(*) as cnt, MIN(deadline_at), MAX(deadline_at) FROM sentinel.sla_tracking GROUP BY sla_type",
+  "branch": "production",
+  "result": [
+    {
+      "sla_type": "first_review",
+      "cnt": 20,
+      "earliest_deadline": "2026-08-27T22:08:18.856Z",
+      "latest_deadline": "2026-08-27T22:08:19.052Z"
+    }
+  ],
+  "promoted_from": "dev",
+  "promoted_to": "production",
+  "promotion_evidence": "Table created on dev branch first (with seed data), validated, then DDL + seed replicated to production branch. Both branches now have identical schema and data.",
+  "authorship": "Co-authored-by: Genie Code <genie-code@databricks.com>"
+}

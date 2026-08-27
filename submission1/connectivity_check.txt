@@ -1,0 +1,16 @@
+Lakebase Instance: sentinel-payments
+Project: projects/sentinel-payments
+Branch: production
+Endpoint: ep-square-surf-d2jl509o.database.us-east-1.cloud.databricks.com
+Database: databricks_postgres
+Postgres Version: 17
+
+SELECT version() result:
+PostgreSQL 17.11 (32e7196) on x86_64-pc-linux-gnu, compiled by gcc (Ubuntu 13.3.0-6ubuntu2~24.04.1) 13.3.0, 64-bit
+
+current_database: databricks_postgres
+current_schema: public
+inet_server_port: 5432
+
+Dev Branch: projects/sentinel-payments/branches/dev
+Dev Endpoint: ep-frosty-bird-d2tzka1d.database.us-east-1.cloud.databricks.com

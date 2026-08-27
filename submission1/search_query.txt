@@ -1,0 +1,43 @@
+-- Hybrid Search: Full-text (BM25-style via tsvector/tsquery) + Vector (pgvector cosine)
+-- Natural-language query: "Which cases involve fraud signals on high-value SNAP payments requiring verification hold?"
+
+-- Full-Text Search Query (GIN-indexed tsvector)
+SELECT
+    case_id,
+    payment_id,
+    program,
+    risk_level,
+    payment_amount_usd,
+    recommended_disposition,
+    ts_rank(reasoning_tsv, plainto_tsquery('english', 'fraud signal verification hold')) AS relevance_score,
+    LEFT(reasoning, 120) AS reasoning_excerpt
+FROM sentinel.cases
+WHERE reasoning_tsv @@ plainto_tsquery('english', 'fraud signal verification hold')
+ORDER BY relevance_score DESC
+LIMIT 10;
+
+-- Vector Similarity Search (IVFFlat-indexed pgvector)
+-- Uses cosine distance (<=>); query embedding generated from same hash function as stored embeddings
+SELECT
+    case_id,
+    payment_id,
+    program,
+    risk_level,
+    payment_amount_usd,
+    1 - (reasoning_embedding <=> :query_embedding) AS cosine_similarity
+FROM sentinel.cases
+WHERE reasoning_embedding IS NOT NULL
+ORDER BY reasoning_embedding <=> :query_embedding
+LIMIT 10;
+
+-- Hybrid Reciprocal Rank Fusion (RRF) combines both signals:
+-- rrf_score = 1/(k + text_rank) + 1/(k + vector_rank), k=60
+-- Implementation: run both queries, merge by case_id, sort by combined rrf_score
+
+-- Extensions installed:
+--   pgvector 0.8.0 (CREATE EXTENSION vector)
+-- Index types:
+--   GIN on reasoning_tsv (full-text)
+--   IVFFlat on reasoning_embedding (vector, lists=10)
+-- Note: lakebase_vector and lakebase_text extensions are available but require
+--   workspace admin enablement via the Previews page (Beta feature).

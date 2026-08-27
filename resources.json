@@ -1,0 +1,25 @@
+{
+  "short_description": "Sentinel \u2014 a federal benefits agency's improper-payment prevention system. A spike of high-risk pre-disbursement payments (triggered by a cross-agency fraud-match feed + eligibility-data refresh ~3 weeks ago) surfaced duplicate identities, deceased payees, income mismatches, and cross-agency fraud flags. A payment-integrity app reads governed payment data at low latency, a disposition recommendation ranks the move (hold / release / investigate) per payment risk and projected recovery, and an examiner approves \u2014 turning governed lakehouse data into a fraud-prevention action, with the assistant's AI spend bounded and observable.",
+  "capabilities": {
+    "buildable": [
+      "synthetic-data-gen",
+      "sdp",
+      "metric-views",
+      "aibi-dashboards",
+      "genie",
+      "databricks-apps",
+      "lakebase"
+    ],
+    "optional": [
+      "ml-training-serving"
+    ],
+    "talking_track": [
+      "lakeflow-connect",
+      "unity-catalog",
+      "ai-gateway",
+      "genie-one",
+      "genie-code"
+    ]
+  },
+  "created_resources": {}
+}

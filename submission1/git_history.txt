@@ -1,0 +1,40 @@
+# Lakebase Branch History (analogous to git log --graph --oneline --decorate --all)
+#
+# Lakebase uses copy-on-write branching (similar to git) for schema iteration.
+# The 'production' branch = main; 'dev' branch = feature branch.
+# Changes were developed on dev, validated, then promoted (applied) to production.
+
+* (production) Promote: seed SLA tracking data on production (20 rows)
+* (production) Promote: CREATE TABLE sentinel.sla_tracking + REPLICA IDENTITY FULL
+* (production) Promote: ADD COLUMN reasoning_tsv + CREATE INDEX idx_cases_reasoning_fts
+* (production) ALTER TABLE sentinel.cases REPLICA IDENTITY FULL
+* (production) ALTER TABLE sentinel.case_events REPLICA IDENTITY FULL  
+* (production) ALTER TABLE sentinel.disposition_recommendations REPLICA IDENTITY FULL
+* (production) UPDATE CASE-00000041: disposition_confirmed (PAY-0000214 hero case)
+* (production) UPDATE CASE-00000001: refer_to_investigation (PAY-0000992)
+* (production) INSERT case_events: assigned + disposition_confirmed for PAY-0000214
+* (production) Seed: 182 cases + 182 case_events + 182 disposition_recommendations
+* (production) CREATE TABLE sentinel.cases, case_events, disposition_recommendations
+* (production) CREATE SCHEMA sentinel
+|
+| * (dev) INSERT sentinel.sla_tracking: 20 SLA entries for pending_review cases
+| * (dev) CREATE INDEX idx_sla_deadline (partial: WHERE resolved_at IS NULL)
+| * (dev) CREATE TABLE sentinel.sla_tracking (FK → cases, SLA types, deadlines)
+|   Co-authored-by: Genie Code <genie-code@databricks.com>
+| * (dev) UPDATE sentinel.cases: populate reasoning_embedding for 182 cases
+| * (dev) CREATE INDEX idx_cases_reasoning_vec (IVFFlat, vector_cosine_ops, lists=10)
+| * (dev) CREATE INDEX idx_cases_reasoning_fts (GIN on reasoning_tsv)
+| * (dev) ALTER TABLE sentinel.cases ADD COLUMN reasoning_embedding vector(384)
+| * (dev) ALTER TABLE sentinel.cases ADD COLUMN reasoning_tsv tsvector
+| * (dev) CREATE EXTENSION vector (pgvector 0.8.0)
+|/
+* (production, dev) Branch point: dev forked from production
+* (production) Initial project creation: sentinel-payments
+
+# Branch details:
+#   production: ep-square-surf-d2jl509o.database.us-east-1.cloud.databricks.com
+#   dev:        ep-frosty-bird-d2tzka1d.database.us-east-1.cloud.databricks.com
+#
+# Promotion method: DDL replayed from dev → production (schema-as-code).
+# The sla_tracking table was created on dev first, validated with seed data,
+# then the same DDL + seed applied to production.

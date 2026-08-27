@@ -1,0 +1,33 @@
+Development Branch: dev
+Full path: projects/sentinel-payments/branches/dev
+Endpoint: ep-frosty-bird-d2tzka1d.database.us-east-1.cloud.databricks.com
+Source branch: production
+Expiry: no_expiry (permanent)
+
+--- Changes made on dev branch ---
+
+1. Schema change: Added vector/FTS columns to sentinel.cases
+   - reasoning_tsv (tsvector, GENERATED ALWAYS AS to_tsvector('english', reasoning))
+   - reasoning_embedding (vector(384))
+
+2. Indexes created on dev:
+   - idx_cases_reasoning_fts (GIN on reasoning_tsv)
+   - idx_cases_reasoning_vec (IVFFlat on reasoning_embedding, lists=10)
+
+3. New table: sentinel.sla_tracking
+   - Tracks SLA deadlines per case (first_review, review_duration, hold_duration, handoff_ack)
+   - FK to sentinel.cases(case_id)
+   - Partial index on deadline_at WHERE resolved_at IS NULL
+   - Seeded with 20 SLA entries for pending_review cases
+
+4. Extension enabled on dev:
+   - CREATE EXTENSION vector (pgvector 0.8.0)
+
+5. Data populated on dev:
+   - 182 embedding vectors generated for all cases with reasoning text
+   - SLA entries auto-created for high/moderate risk cases
+
+--- Promoted to production ---
+
+- sentinel.sla_tracking table (DDL + REPLICA IDENTITY FULL)
+- reasoning_tsv column + GIN index on production sentinel.cases

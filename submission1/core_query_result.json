@@ -1,0 +1,7 @@
+[
+  {"program": "TANF", "flagged_payments": 36, "total_exposure_usd": 31912.80, "total_projected_recovery_usd": 20743.32, "avg_exposure_per_payment": 886.47, "avg_signals": 1.7, "high_risk_count": 19},
+  {"program": "SNAP", "flagged_payments": 44, "total_exposure_usd": 31721.59, "total_projected_recovery_usd": 20619.03, "avg_exposure_per_payment": 720.95, "avg_signals": 1.7, "high_risk_count": 19},
+  {"program": "Veteran's", "flagged_payments": 37, "total_exposure_usd": 31430.16, "total_projected_recovery_usd": 20429.60, "avg_exposure_per_payment": 849.46, "avg_signals": 1.6, "high_risk_count": 15},
+  {"program": "Child Care", "flagged_payments": 35, "total_exposure_usd": 30088.90, "total_projected_recovery_usd": 19557.78, "avg_exposure_per_payment": 859.68, "avg_signals": 1.8, "high_risk_count": 20},
+  {"program": "Disability", "flagged_payments": 30, "total_exposure_usd": 27511.10, "total_projected_recovery_usd": 17882.21, "avg_exposure_per_payment": 917.04, "avg_signals": 1.9, "high_risk_count": 18}
+]

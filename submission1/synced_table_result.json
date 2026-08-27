@@ -1,0 +1,12 @@
+[
+  {"payment_id": "PAY-0000992", "program": "SNAP", "risk_level": "high", "n_signals": 3, "payment_amount_usd": 3436.08, "improper_payment_exposure_usd": 2748.86, "projected_recovery_if_investigated_usd": 1786.76},
+  {"payment_id": "PAY-0000388", "program": "Disability", "risk_level": "high", "n_signals": 3, "payment_amount_usd": 3412.50, "improper_payment_exposure_usd": 2730.00, "projected_recovery_if_investigated_usd": 1774.50},
+  {"payment_id": "PAY-0000301", "program": "SNAP", "risk_level": "high", "n_signals": 2, "payment_amount_usd": 3349.66, "improper_payment_exposure_usd": 2679.73, "projected_recovery_if_investigated_usd": 1741.82},
+  {"payment_id": "PAY-0000803", "program": "Veteran's", "risk_level": "high", "n_signals": 2, "payment_amount_usd": 3331.36, "improper_payment_exposure_usd": 2665.09, "projected_recovery_if_investigated_usd": 1732.31},
+  {"payment_id": "PAY-0000945", "program": "Veteran's", "risk_level": "high", "n_signals": 2, "payment_amount_usd": 3324.82, "improper_payment_exposure_usd": 2659.86, "projected_recovery_if_investigated_usd": 1728.91},
+  {"payment_id": "PAY-0000199", "program": "Disability", "risk_level": "high", "n_signals": 2, "payment_amount_usd": 3227.37, "improper_payment_exposure_usd": 2581.90, "projected_recovery_if_investigated_usd": 1678.23},
+  {"payment_id": "PAY-0001018", "program": "Child Care", "risk_level": "high", "n_signals": 2, "payment_amount_usd": 3222.48, "improper_payment_exposure_usd": 2577.99, "projected_recovery_if_investigated_usd": 1675.69},
+  {"payment_id": "PAY-0000229", "program": "Child Care", "risk_level": "high", "n_signals": 2, "payment_amount_usd": 3162.34, "improper_payment_exposure_usd": 2529.87, "projected_recovery_if_investigated_usd": 1644.41},
+  {"payment_id": "PAY-0000268", "program": "SNAP", "risk_level": "high", "n_signals": 3, "payment_amount_usd": 3089.46, "improper_payment_exposure_usd": 2471.57, "projected_recovery_if_investigated_usd": 1606.52},
+  {"payment_id": "PAY-0000121", "program": "TANF", "risk_level": "high", "n_signals": 3, "payment_amount_usd": 3047.82, "improper_payment_exposure_usd": 2438.26, "projected_recovery_if_investigated_usd": 1584.87}
+]
