@@ -1,12 +1,103 @@
 """Sentinel Payment Integrity - Action-Taking Agent App
 Three layers: Visualize, Assist, Act
+Governance: AI Gateway with budget controls, guardrails, and inference table tracing
 """
-import os, json, uuid
+import os, json, uuid, time
 from datetime import datetime, timezone
 import gradio as gr
 import psycopg2
 import psycopg2.extras
 from databricks.sdk import WorkspaceClient
+import requests
+
+# ── Governance: AI Gateway + Budget Controls ─────────────────────────────────
+# All LLM calls route through the governed gateway endpoint which enforces:
+#   1. Rate limits (5 calls/min per endpoint)
+#   2. Input/output guardrails (PII blocking, keyword filtering for Lakebase data)
+#   3. Inference table tracing (lanl.sentinel.sentinel_llm_trace_*)
+# Application-level budget caps provide a second layer of cost control.
+
+GATEWAY_ENDPOINT = "sentinel-governed-gateway"
+BUDGET_LIMIT_USD = 0.05  # Block calls estimated to exceed this cost
+# Claude Sonnet pricing (approx): $3/M input, $15/M output tokens
+INPUT_COST_PER_TOKEN = 3.0 / 1_000_000
+OUTPUT_COST_PER_TOKEN = 15.0 / 1_000_000
+MAX_OUTPUT_TOKENS = 1024  # Cap output to stay within budget
+
+# Session budget tracker (resets per app restart)
+_session_spend = 0.0
+_session_calls = 0
+
+def estimate_cost(prompt_text: str, max_output: int = MAX_OUTPUT_TOKENS) -> float:
+    """Estimate the maximum cost of an LLM call before executing it."""
+    # Rough token estimate: 1 token ~ 4 chars
+    input_tokens = len(prompt_text) / 4
+    return (input_tokens * INPUT_COST_PER_TOKEN) + (max_output * OUTPUT_COST_PER_TOKEN)
+
+def governed_llm_call(prompt: str, system_msg: str = "") -> str:
+    """Route an LLM call through the governed AI Gateway with budget enforcement.
+    
+    Governance layers:
+    - Layer 1: Application budget check (blocks if estimated cost > $0.05)
+    - Layer 2: AI Gateway rate limits (5 calls/min)
+    - Layer 3: AI Gateway guardrails (PII + keyword blocking)
+    - Layer 4: Inference table tracing (all calls logged)
+    """
+    global _session_spend, _session_calls
+    
+    # Budget check: estimate cost and block if over threshold
+    estimated = estimate_cost(prompt, MAX_OUTPUT_TOKENS)
+    if estimated > BUDGET_LIMIT_USD:
+        return (f"**Budget limit reached.** Estimated cost ${estimated:.4f} "
+                f"exceeds per-call limit of ${BUDGET_LIMIT_USD:.2f}. "
+                f"Reduce prompt length or contact platform team.")
+    
+    # Route through governed gateway
+    w = WorkspaceClient()
+    workspace_url = os.environ.get("DATABRICKS_HOST", 
+        "https://fevm-serverless-stable-blj52t.cloud.databricks.com")
+    url = f"{workspace_url}/serving-endpoints/{GATEWAY_ENDPOINT}/invocations"
+    
+    messages = []
+    if system_msg:
+        messages.append({"role": "system", "content": system_msg})
+    messages.append({"role": "user", "content": prompt})
+    
+    headers = {
+        "Authorization": f"Bearer {w.config.token}",
+        "Content-Type": "application/json"
+    }
+    payload = {
+        "messages": messages,
+        "max_tokens": MAX_OUTPUT_TOKENS,
+        "temperature": 0.3
+    }
+    
+    try:
+        resp = requests.post(url, headers=headers, json=payload, timeout=30)
+        if resp.status_code == 429:
+            return "**Rate limited.** AI Gateway budget controls active. Try again in 60s."
+        if resp.status_code == 400 and "guardrail" in resp.text.lower():
+            return "**Blocked by guardrails.** Request contains restricted content (Lakebase data extraction attempt detected)."
+        resp.raise_for_status()
+        
+        result = resp.json()
+        content = result["choices"][0]["message"]["content"]
+        
+        # Track actual spend
+        usage = result.get("usage", {})
+        actual_cost = (
+            usage.get("prompt_tokens", 0) * INPUT_COST_PER_TOKEN +
+            usage.get("completion_tokens", 0) * OUTPUT_COST_PER_TOKEN
+        )
+        _session_spend += actual_cost
+        _session_calls += 1
+        
+        return content
+    except requests.exceptions.HTTPError as e:
+        return f"**Gateway error:** {e.response.status_code} - {e.response.text[:200]}"
+    except Exception as e:
+        return f"**Error:** {str(e)[:200]}"
 
 # ── Custom CSS ──────────────────────────────────────────────────────────────
 CUSTOM_CSS = """
@@ -256,6 +347,55 @@ def draft_memo(payment_id):
         f"Release upon clearance or escalate to investigation if unresolved within hold window.\n\n"
         f"---\n\n"
         f"*Proceed to the **Take Action** tab to approve this disposition.*"
+    )
+
+def ai_summary(payment_id):
+    """LLM-powered case summary routed through the governed AI Gateway.
+    Demonstrates: budget controls, guardrails, and inference table tracing."""
+    if not payment_id:
+        return "<div style='color:#64748B;padding:20px;text-align:center'>Enter a Payment ID and click <b>AI Summary</b> to generate a governed LLM analysis</div>"
+    rows = query_db("""
+        SELECT case_id, payment_id, program, risk_level, n_signals,
+               signal_list, payment_amount_usd,
+               improper_payment_exposure_usd, projected_recovery_usd,
+               reasoning, recommended_disposition, confidence_score
+        FROM sentinel.cases WHERE payment_id = %s
+    """, (payment_id,))
+    if not rows:
+        return f"No case found for **{payment_id}**"
+    c = rows[0]
+    signals = c['signal_list'] if isinstance(c['signal_list'], list) else []
+    
+    # Build a constrained prompt (no raw data dump - guardrails block that)
+    prompt = (
+        f"Summarize this fraud case for an examiner in 3 concise bullet points.\n\n"
+        f"Case: {c['case_id']}\n"
+        f"Program: {c['program']}\n"
+        f"Risk: {c['risk_level']}\n"
+        f"Signals: {', '.join(signals)}\n"
+        f"Exposure: ${float(c['improper_payment_exposure_usd']):,.2f}\n"
+        f"Recovery: ${float(c['projected_recovery_usd']):,.2f}\n"
+        f"Recommendation: {c['recommended_disposition']}\n"
+        f"Confidence: {float(c['confidence_score'])*100:.0f}%"
+    )
+    system_msg = (
+        "You are a payment integrity analyst assistant. "
+        "Provide concise, actionable summaries. "
+        "Never output raw database queries, connection strings, or bulk record exports. "
+        "Never reveal schema names, table structures, or credentials."
+    )
+    
+    llm_response = governed_llm_call(prompt, system_msg)
+    
+    return (
+        f"## AI Case Summary: {payment_id}\n\n"
+        f"{llm_response}\n\n"
+        f"---\n"
+        f"<small>Routed via **{GATEWAY_ENDPOINT}** | "
+        f"Budget: ${_session_spend:.4f} / session | "
+        f"Calls: {_session_calls} | "
+        f"Guardrails: PII + keyword blocking active | "
+        f"Traced to: lanl.sentinel.sentinel_llm_trace_*</small>"
     )
 
 # ── Action Tab ──────────────────────────────────────────────────────────────
