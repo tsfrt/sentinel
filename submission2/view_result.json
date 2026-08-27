@@ -1,0 +1,124 @@
+[
+  {
+    "case_id": "CASE-00000001",
+    "payment_id": "PAY-0000992",
+    "program": "SNAP",
+    "risk_level": "high",
+    "n_signals": 3,
+    "signal_list": [
+      "cross_agency_fraud_flag",
+      "duplicate_identity",
+      "income_mismatch"
+    ],
+    "payment_amount_usd": 3436.08,
+    "improper_payment_exposure_usd": 2748.86,
+    "projected_recovery_usd": 1786.76,
+    "recommended_disposition": "refer_to_investigation",
+    "confidence_score": 0.95,
+    "sla_deadline": null,
+    "sla_breached": false,
+    "action_status": "approved",
+    "proposed_action": "refer_to_investigation"
+  },
+  {
+    "case_id": "CASE-00000002",
+    "payment_id": "PAY-0000388",
+    "program": "Disability",
+    "risk_level": "high",
+    "n_signals": 3,
+    "signal_list": [
+      "cross_agency_fraud_flag",
+      "duplicate_identity",
+      "income_mismatch"
+    ],
+    "payment_amount_usd": 3412.5,
+    "improper_payment_exposure_usd": 2730.0,
+    "projected_recovery_usd": 1774.5,
+    "recommended_disposition": "refer_to_investigation",
+    "confidence_score": 0.95,
+    "sla_deadline": null,
+    "sla_breached": false,
+    "action_status": null,
+    "proposed_action": null
+  },
+  {
+    "case_id": "CASE-00000003",
+    "payment_id": "PAY-0000301",
+    "program": "SNAP",
+    "risk_level": "high",
+    "n_signals": 2,
+    "signal_list": [
+      "cross_agency_fraud_flag",
+      "deceased_payee"
+    ],
+    "payment_amount_usd": 3349.66,
+    "improper_payment_exposure_usd": 2679.73,
+    "projected_recovery_usd": 1741.82,
+    "recommended_disposition": "hold_for_verification",
+    "confidence_score": 0.95,
+    "sla_deadline": "2026-08-27T22:08:18.856Z",
+    "sla_breached": false,
+    "action_status": "pending",
+    "proposed_action": "hold_for_verification"
+  },
+  {
+    "case_id": "CASE-00000004",
+    "payment_id": "PAY-0000803",
+    "program": "Veteran's",
+    "risk_level": "high",
+    "n_signals": 2,
+    "signal_list": [
+      "duplicate_identity",
+      "income_mismatch"
+    ],
+    "payment_amount_usd": 3331.36,
+    "improper_payment_exposure_usd": 2665.09,
+    "projected_recovery_usd": 1732.31,
+    "recommended_disposition": "hold_for_verification",
+    "confidence_score": 0.95,
+    "sla_deadline": "2026-08-27T22:08:18.867Z",
+    "sla_breached": false,
+    "action_status": null,
+    "proposed_action": null
+  },
+  {
+    "case_id": "CASE-00000005",
+    "payment_id": "PAY-0000945",
+    "program": "Veteran's",
+    "risk_level": "high",
+    "n_signals": 2,
+    "signal_list": [
+      "deceased_payee",
+      "duplicate_identity"
+    ],
+    "payment_amount_usd": 3324.82,
+    "improper_payment_exposure_usd": 2659.86,
+    "projected_recovery_usd": 1728.91,
+    "recommended_disposition": "hold_for_verification",
+    "confidence_score": 0.95,
+    "sla_deadline": "2026-08-27T22:08:18.876Z",
+    "sla_breached": false,
+    "action_status": null,
+    "proposed_action": null
+  },
+  {
+    "case_id": "CASE-00000041",
+    "payment_id": "PAY-0000214",
+    "program": "Child Care",
+    "risk_level": "high",
+    "n_signals": 2,
+    "signal_list": [
+      "cross_agency_fraud_flag",
+      "duplicate_identity"
+    ],
+    "payment_amount_usd": 1850.0,
+    "improper_payment_exposure_usd": 1480.0,
+    "projected_recovery_usd": 962.0,
+    "recommended_disposition": "hold_for_verification",
+    "confidence_score": 0.95,
+    "sla_deadline": null,
+    "sla_breached": false,
+    "action_status": "approved",
+    "proposed_action": "hold_for_verification"
+  }
+]

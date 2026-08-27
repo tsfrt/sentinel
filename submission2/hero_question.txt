@@ -1,0 +1,36 @@
+Hero Question:
+"Should we hold, release, or investigate Payment PAY-0000214 — a $1,850 Child Care
+disbursement flagged by the cross-agency fraud match with duplicate identity signals —
+before it goes out the door today?"
+
+Decision Type: Pre-disbursement disposition (surface → prescribe → approve → act)
+
+Answer (not a lookup, not a dashboard — a DECISION):
+HOLD FOR VERIFICATION, 48 HOURS. The dual signals (cross_agency_fraud_flag at 97%
+confidence + duplicate_identity) justify pausing disbursement while identity documents
+are validated. Net value of hold vs. release: +$917. Approved by Deputy Commissioner.
+
+Linked Record IDs forming the decision chain:
+
+  Case:        CASE-00000041
+  Payment:     PAY-0000214
+  Beneficiary: BEN-0000173
+  Action:      act-hero-001 (sentinel.examiner_actions)
+
+  Trigger event:     193e8a75-... (sentinel.workflow_state, event_type=trigger_scored)
+  View opened:       417fc76c-... (sentinel.workflow_state, event_type=view_opened)
+  Assist explain:    beb14423-... (sentinel.workflow_state, event_type=assist_query)
+  Assist what-if:    bdd07737-... (sentinel.workflow_state, event_type=assist_query)
+  Action proposed:   2e32f5c2-... (sentinel.workflow_state, event_type=action_proposed)
+  Action approved:   9e41eaee-... (sentinel.workflow_state, event_type=action_approved)
+  Action committed:  bc76705a-... (sentinel.workflow_state, event_type=action_committed)
+  Decision closed:   3e64bcd8-... (sentinel.workflow_state, event_type=decision_recorded)
+
+  SLA tracking:      sentinel.sla_tracking (CASE-00000041, first_review, 4h deadline)
+  ML recommendation: sentinel.disposition_recommendations (PAY-0000214, hold_for_verification)
+  Synced UC table:   sentinel.synced_gold_open_queue (read-only mirror from lanl.sentinel.gold_open_queue)
+
+Closed Loop Evidence:
+  The committed disposition (hold_for_verification) is reflected in the next read of
+  the live queue view — the action_status column shows 'approved' for CASE-00000041,
+  proving the write-back is visible on the next query cycle.

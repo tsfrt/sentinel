@@ -1,0 +1,50 @@
+[
+  {
+    "action_id": "act-hero-001",
+    "case_id": "CASE-00000041",
+    "payment_id": "PAY-0000214",
+    "proposed_action": "hold_for_verification",
+    "proposed_by": "system",
+    "proposed_at": "2026-08-27T19:19:00.000Z",
+    "approval_status": "approved",
+    "approved_by": "della.okonkwo@sentinel.gov",
+    "approved_at": "2026-08-27T19:20:00.000Z",
+    "committed_at": "2026-08-27T19:20:05.000Z",
+    "rationale": "Hold 48 hours \u2014 dual signals (cross_agency_fraud_flag + duplicate_identity) justify verification window. Predicted recovery $962 at 95% confidence. Protects program integrity while minimizing beneficiary impact.",
+    "confidence_score": 0.95,
+    "exposure_usd": 1480.0,
+    "recovery_usd": 962.0
+  },
+  {
+    "action_id": "act-002",
+    "case_id": "CASE-00000001",
+    "payment_id": "PAY-0000992",
+    "proposed_action": "refer_to_investigation",
+    "proposed_by": "system",
+    "proposed_at": "2026-08-27T19:25:00.000Z",
+    "approval_status": "approved",
+    "approved_by": "della.okonkwo@sentinel.gov",
+    "approved_at": "2026-08-27T19:26:00.000Z",
+    "committed_at": "2026-08-27T19:26:05.000Z",
+    "rationale": "Refer to OIG \u2014 triple stacked signals (cross_agency_fraud_flag + duplicate_identity + income_mismatch) on $3436 SNAP payment. Exposure $2749, projected full recovery via investigation.",
+    "confidence_score": 0.95,
+    "exposure_usd": 2748.86,
+    "recovery_usd": 1786.76
+  },
+  {
+    "action_id": "act-003",
+    "case_id": "CASE-00000003",
+    "payment_id": "PAY-0000301",
+    "proposed_action": "hold_for_verification",
+    "proposed_by": "system",
+    "proposed_at": "2026-08-27T19:30:00.000Z",
+    "approval_status": "pending",
+    "approved_by": null,
+    "approved_at": null,
+    "committed_at": null,
+    "rationale": "Awaiting examiner review \u2014 2 signals on $3350 SNAP payment. Hold recommended pending verification of cross-agency match.",
+    "confidence_score": 0.85,
+    "exposure_usd": 2679.73,
+    "recovery_usd": 1741.82
+  }
+]

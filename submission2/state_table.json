@@ -1,0 +1,108 @@
+[
+  {
+    "event_id": "193e8a75-3f90-4180-b7c7-0b04ee59200a",
+    "event_type": "trigger_scored",
+    "case_id": "CASE-00000041",
+    "actor": "system",
+    "payload": {
+      "trigger": "cross_agency_fraud_match_feed",
+      "payment_id": "PAY-0000214",
+      "risk_score": 0.95,
+      "signals": [
+        "cross_agency_fraud_flag",
+        "duplicate_identity"
+      ],
+      "exposure_usd": 1480.0
+    },
+    "recorded_at": "2026-08-27T18:08:19.271Z"
+  },
+  {
+    "event_id": "417fc76c-dfe2-42b2-bff7-d31a263d918a",
+    "event_type": "view_opened",
+    "case_id": "CASE-00000041",
+    "actor": "della.okonkwo@sentinel.gov",
+    "payload": {
+      "view": "pre_disbursement_queue",
+      "filter": "risk_level=high",
+      "sort": "exposure_desc"
+    },
+    "recorded_at": "2026-08-27T19:15:00.000Z"
+  },
+  {
+    "event_id": "beb14423-2392-47aa-95e0-84687bf36c9a",
+    "event_type": "assist_query",
+    "case_id": "CASE-00000041",
+    "actor": "della.okonkwo@sentinel.gov",
+    "payload": {
+      "query": "Why is PAY-0000214 flagged and what should we do?",
+      "tool": "find_flag",
+      "response_summary": "2 signals: cross_agency_fraud_flag + duplicate_identity on $1850 Child Care. Exposure $1480."
+    },
+    "recorded_at": "2026-08-27T19:16:30.000Z"
+  },
+  {
+    "event_id": "bdd07737-dc05-4a29-9766-c067080f1f56",
+    "event_type": "assist_query",
+    "case_id": "CASE-00000041",
+    "actor": "della.okonkwo@sentinel.gov",
+    "payload": {
+      "query": "What if we release it instead of holding?",
+      "tool": "rank_dispositions",
+      "response_summary": "Release: $0 recovery, full $1480 risk. Hold 48h: $962 projected recovery. Refer: $1480 recovery but 30-day delay."
+    },
+    "recorded_at": "2026-08-27T19:18:00.000Z"
+  },
+  {
+    "event_id": "2e32f5c2-0b35-4c1e-8e4f-17b6da8f66a5",
+    "event_type": "action_proposed",
+    "case_id": "CASE-00000041",
+    "actor": "system",
+    "payload": {
+      "payment_id": "PAY-0000214",
+      "proposed_action": "hold_for_verification",
+      "hold_duration_hours": 48,
+      "predicted_recovery_usd": 962.0,
+      "confidence": 0.95
+    },
+    "recorded_at": "2026-08-27T19:19:00.000Z"
+  },
+  {
+    "event_id": "9e41eaee-8f0d-472f-95f5-2d7115ff1c8a",
+    "event_type": "action_approved",
+    "case_id": "CASE-00000041",
+    "actor": "della.okonkwo@sentinel.gov",
+    "payload": {
+      "payment_id": "PAY-0000214",
+      "action": "hold_for_verification",
+      "approver": "della.okonkwo@sentinel.gov",
+      "rationale": "Approve hold \u2014 dual signals justify 48h verification window"
+    },
+    "recorded_at": "2026-08-27T19:20:00.000Z"
+  },
+  {
+    "event_id": "bc76705a-dbcc-4125-b318-e7333ebd5df6",
+    "event_type": "action_committed",
+    "case_id": "CASE-00000041",
+    "actor": "system",
+    "payload": {
+      "payment_id": "PAY-0000214",
+      "action_id": "act-hero-001",
+      "action": "hold_for_verification",
+      "committed": true
+    },
+    "recorded_at": "2026-08-27T19:20:05.000Z"
+  },
+  {
+    "event_id": "3e64bcd8-b052-4a5c-b1c6-3fe641d95946",
+    "event_type": "decision_recorded",
+    "case_id": "CASE-00000041",
+    "actor": "della.okonkwo@sentinel.gov",
+    "payload": {
+      "payment_id": "PAY-0000214",
+      "final_disposition": "hold_for_verification",
+      "recovery_usd": 962.0,
+      "closed_loop": true
+    },
+    "recorded_at": "2026-08-27T19:20:10.000Z"
+  }
+]
