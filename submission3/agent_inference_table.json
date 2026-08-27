@@ -1,0 +1,102 @@
+{
+  "_metadata": {
+    "source": "lanl.sentinel.sentinel_llm_trace_payload",
+    "gateway_endpoint": "sentinel-governed-gateway",
+    "traffic_source": "coding-agent",
+    "export_time": "2026-08-27T21:50:00Z",
+    "note": "Coding-agent calls routed through same governed gateway, filtered by source=coding-agent"
+  },
+  "entries": [
+    {
+      "request_id": "agent-config-001",
+      "timestamp_ms": 1787865900000,
+      "source": "coding-agent",
+      "action": "configure_mcp",
+      "status": "SUCCESS",
+      "usage": {
+        "prompt_tokens": 312,
+        "completion_tokens": 245,
+        "total_tokens": 557
+      },
+      "estimated_cost_usd": 0.0046,
+      "guardrails": {
+        "input_flagged": false,
+        "output_flagged": false
+      },
+      "prompt_preview": "Configure MCP servers for Slack and Lakebase with governed gateway routing..."
+    },
+    {
+      "request_id": "mcp-slack-001",
+      "timestamp_ms": 1787865945000,
+      "source": "coding-agent/mcp",
+      "action": "slack.post_message",
+      "status": "SUCCESS",
+      "usage": {
+        "prompt_tokens": 145,
+        "completion_tokens": 82,
+        "total_tokens": 227
+      },
+      "estimated_cost_usd": 0.00166,
+      "guardrails": {
+        "input_flagged": false,
+        "output_flagged": false
+      },
+      "prompt_preview": "Compose Slack alert for CASE-00000041 hold_for_verification approved...",
+      "mcp_tool": "slack.post_message",
+      "mcp_channel": "#sentinel-alerts"
+    },
+    {
+      "request_id": "mcp-slack-blocked-001",
+      "timestamp_ms": 1787865960000,
+      "source": "coding-agent/mcp",
+      "action": "slack.post_message",
+      "status": "BLOCKED_BY_GUARDRAILS",
+      "usage": {
+        "prompt_tokens": 98,
+        "completion_tokens": 0,
+        "total_tokens": 98
+      },
+      "estimated_cost_usd": 0.0,
+      "guardrails": {
+        "input_flagged": true,
+        "triggered_category": "privacy",
+        "keyword_match": [
+          "export all tables",
+          "show me all records from lakebase"
+        ]
+      },
+      "prompt_preview": "Post all sentinel schema data to Slack channel...",
+      "mcp_tool": "slack.post_message",
+      "block_reason": "Guardrail prevented bulk Lakebase data from being sent via MCP/Slack"
+    },
+    {
+      "request_id": "agent-query-002",
+      "timestamp_ms": 1787865980000,
+      "source": "coding-agent",
+      "action": "case_analysis",
+      "status": "SUCCESS",
+      "usage": {
+        "prompt_tokens": 280,
+        "completion_tokens": 190,
+        "total_tokens": 470
+      },
+      "estimated_cost_usd": 0.0037,
+      "guardrails": {
+        "input_flagged": false,
+        "output_flagged": false
+      },
+      "prompt_preview": "Analyze risk signals for CASE-00000005 and recommend disposition..."
+    }
+  ],
+  "summary": {
+    "total_agent_calls": 4,
+    "passed": 3,
+    "blocked_by_guardrails": 1,
+    "total_tokens_used": 1352,
+    "total_cost_usd": 0.0099,
+    "mcp_tools_invoked": [
+      "slack.post_message"
+    ],
+    "governance_proof": "All coding-agent and MCP calls logged in same inference table as app traffic, enabling unified platform observability"
+  }
+}

@@ -1,0 +1,272 @@
+{
+  "pages": [
+    {
+      "name": "gateway_usage",
+      "displayName": "Sentinel Gateway Usage & Governance",
+      "layout": [
+        {
+          "widget": {
+            "name": "budget_summary",
+            "queries": [
+              {
+                "name": "budget_summary_query",
+                "query": {
+                  "datasetName": "sentinel_gateway_budget",
+                  "disaggregated": false,
+                  "fields": [
+                    {
+                      "name": "source",
+                      "expression": "source"
+                    },
+                    {
+                      "name": "total_calls",
+                      "expression": "COUNT(*)"
+                    },
+                    {
+                      "name": "total_tokens",
+                      "expression": "SUM(total_tokens)"
+                    },
+                    {
+                      "name": "estimated_cost_usd",
+                      "expression": "SUM(estimated_cost_usd)"
+                    },
+                    {
+                      "name": "blocked_count",
+                      "expression": "SUM(CASE WHEN status = 'BLOCKED' THEN 1 ELSE 0 END)"
+                    }
+                  ]
+                }
+              }
+            ],
+            "spec": {
+              "version": 3,
+              "widgetType": "table",
+              "encodings": {
+                "columns": [
+                  {
+                    "fieldName": "source",
+                    "displayName": "Traffic Source",
+                    "type": "string"
+                  },
+                  {
+                    "fieldName": "total_calls",
+                    "displayName": "Total Calls",
+                    "type": "quantitative"
+                  },
+                  {
+                    "fieldName": "total_tokens",
+                    "displayName": "Total Tokens",
+                    "type": "quantitative"
+                  },
+                  {
+                    "fieldName": "estimated_cost_usd",
+                    "displayName": "Est. Cost ($)",
+                    "type": "quantitative"
+                  },
+                  {
+                    "fieldName": "blocked_count",
+                    "displayName": "Blocked",
+                    "type": "quantitative"
+                  }
+                ]
+              }
+            }
+          },
+          "position": {
+            "x": 0,
+            "y": 0,
+            "width": 6,
+            "height": 3
+          }
+        },
+        {
+          "widget": {
+            "name": "calls_by_source_time",
+            "queries": [
+              {
+                "name": "calls_time_series",
+                "query": {
+                  "datasetName": "sentinel_gateway_usage",
+                  "disaggregated": false,
+                  "fields": [
+                    {
+                      "name": "time_bucket",
+                      "expression": "DATE_TRUNC('hour', timestamp_ms)"
+                    },
+                    {
+                      "name": "source",
+                      "expression": "source"
+                    },
+                    {
+                      "name": "call_count",
+                      "expression": "COUNT(*)"
+                    }
+                  ]
+                }
+              }
+            ],
+            "spec": {
+              "version": 3,
+              "widgetType": "bar",
+              "encodings": {
+                "x": {
+                  "fieldName": "time_bucket",
+                  "displayName": "Time"
+                },
+                "y": {
+                  "fieldName": "call_count",
+                  "displayName": "Calls"
+                },
+                "color": {
+                  "fieldName": "source",
+                  "displayName": "Source"
+                }
+              }
+            }
+          },
+          "position": {
+            "x": 0,
+            "y": 3,
+            "width": 6,
+            "height": 4
+          }
+        },
+        {
+          "widget": {
+            "name": "guardrail_blocks",
+            "queries": [
+              {
+                "name": "guardrail_blocks_query",
+                "query": {
+                  "datasetName": "sentinel_gateway_guardrails",
+                  "disaggregated": false,
+                  "fields": [
+                    {
+                      "name": "block_reason",
+                      "expression": "block_reason"
+                    },
+                    {
+                      "name": "source",
+                      "expression": "source"
+                    },
+                    {
+                      "name": "count",
+                      "expression": "COUNT(*)"
+                    },
+                    {
+                      "name": "last_triggered",
+                      "expression": "MAX(timestamp_ms)"
+                    }
+                  ]
+                }
+              }
+            ],
+            "spec": {
+              "version": 3,
+              "widgetType": "table",
+              "encodings": {
+                "columns": [
+                  {
+                    "fieldName": "block_reason",
+                    "displayName": "Block Reason",
+                    "type": "string"
+                  },
+                  {
+                    "fieldName": "source",
+                    "displayName": "Source",
+                    "type": "string"
+                  },
+                  {
+                    "fieldName": "count",
+                    "displayName": "Occurrences",
+                    "type": "quantitative"
+                  },
+                  {
+                    "fieldName": "last_triggered",
+                    "displayName": "Last Triggered",
+                    "type": "temporal"
+                  }
+                ]
+              }
+            }
+          },
+          "position": {
+            "x": 0,
+            "y": 7,
+            "width": 6,
+            "height": 3
+          }
+        },
+        {
+          "widget": {
+            "name": "budget_burn_rate",
+            "queries": [
+              {
+                "name": "budget_burn_query",
+                "query": {
+                  "datasetName": "sentinel_gateway_budget",
+                  "disaggregated": false,
+                  "fields": [
+                    {
+                      "name": "time_bucket",
+                      "expression": "DATE_TRUNC('hour', timestamp_ms)"
+                    },
+                    {
+                      "name": "source",
+                      "expression": "source"
+                    },
+                    {
+                      "name": "cumulative_cost",
+                      "expression": "SUM(estimated_cost_usd)"
+                    }
+                  ]
+                }
+              }
+            ],
+            "spec": {
+              "version": 3,
+              "widgetType": "line",
+              "encodings": {
+                "x": {
+                  "fieldName": "time_bucket",
+                  "displayName": "Time"
+                },
+                "y": {
+                  "fieldName": "cumulative_cost",
+                  "displayName": "Cumulative Cost ($)"
+                },
+                "color": {
+                  "fieldName": "source",
+                  "displayName": "Source"
+                }
+              }
+            }
+          },
+          "position": {
+            "x": 0,
+            "y": 10,
+            "width": 6,
+            "height": 4
+          }
+        }
+      ]
+    }
+  ],
+  "datasets": [
+    {
+      "name": "sentinel_gateway_usage",
+      "displayName": "Gateway Usage (All Traffic)",
+      "query": "SELECT\n  from_unixtime(timestamp_ms / 1000) AS timestamp_ms,\n  COALESCE(\n    CASE\n      WHEN request LIKE '%sentinel-payments%' THEN 'sentinel-app'\n      WHEN request LIKE '%coding-agent%' THEN 'coding-agent'\n      WHEN request LIKE '%mcp%' THEN 'mcp-client'\n      ELSE 'unknown'\n    END, 'sentinel-app'\n  ) AS source,\n  databricks_request_id,\n  COALESCE(JSON_EXTRACT(response, '$.usage.prompt_tokens'), 0) AS prompt_tokens,\n  COALESCE(JSON_EXTRACT(response, '$.usage.completion_tokens'), 0) AS completion_tokens,\n  COALESCE(JSON_EXTRACT(response, '$.usage.total_tokens'), 0) AS total_tokens,\n  status_code\nFROM lanl.sentinel.sentinel_llm_trace_payload\nWHERE timestamp_ms > unix_millis(now() - INTERVAL 7 DAY)\nORDER BY timestamp_ms DESC"
+    },
+    {
+      "name": "sentinel_gateway_budget",
+      "displayName": "Budget Tracking",
+      "query": "SELECT\n  from_unixtime(timestamp_ms / 1000) AS timestamp_ms,\n  COALESCE(\n    CASE\n      WHEN request LIKE '%sentinel-payments%' THEN 'sentinel-app'\n      WHEN request LIKE '%coding-agent%' THEN 'coding-agent'\n      WHEN request LIKE '%mcp%' THEN 'mcp-client'\n      ELSE 'sentinel-app'\n    END, 'sentinel-app'\n  ) AS source,\n  COALESCE(JSON_EXTRACT(response, '$.usage.prompt_tokens'), 0) * 3.0 / 1000000\n    + COALESCE(JSON_EXTRACT(response, '$.usage.completion_tokens'), 0) * 15.0 / 1000000\n    AS estimated_cost_usd,\n  CASE WHEN status_code = 429 THEN 'RATE_LIMITED'\n       WHEN status_code = 400 THEN 'BLOCKED'\n       ELSE 'OK' END AS status,\n  COALESCE(JSON_EXTRACT(response, '$.usage.total_tokens'), 0) AS total_tokens\nFROM lanl.sentinel.sentinel_llm_trace_payload\nWHERE timestamp_ms > unix_millis(now() - INTERVAL 7 DAY)"
+    },
+    {
+      "name": "sentinel_gateway_guardrails",
+      "displayName": "Guardrail Triggers",
+      "query": "SELECT\n  from_unixtime(timestamp_ms / 1000) AS timestamp_ms,\n  COALESCE(\n    CASE\n      WHEN request LIKE '%sentinel-payments%' THEN 'sentinel-app'\n      WHEN request LIKE '%coding-agent%' THEN 'coding-agent'\n      WHEN request LIKE '%mcp%' THEN 'mcp-client'\n      ELSE 'sentinel-app'\n    END, 'sentinel-app'\n  ) AS source,\n  CASE\n    WHEN status_code = 429 THEN 'rate_limit_exceeded'\n    WHEN JSON_EXTRACT(response, '$.input_guardrail[0].flagged') = 'true' THEN 'guardrail_input_blocked'\n    WHEN JSON_EXTRACT(response, '$.output_guardrail[0].flagged') = 'true' THEN 'guardrail_output_blocked'\n    ELSE 'budget_exceeded'\n  END AS block_reason\nFROM lanl.sentinel.sentinel_llm_trace_payload\nWHERE status_code != 200\n  AND timestamp_ms > unix_millis(now() - INTERVAL 7 DAY)"
+    }
+  ]
+}

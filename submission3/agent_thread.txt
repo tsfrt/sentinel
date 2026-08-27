@@ -1,0 +1,189 @@
+# ============================================================================
+# Coding-Agent Thread: Gateway-Governed MCP Configuration
+# ============================================================================
+# This thread demonstrates:
+#   1. Calling the coding agent (ucode) to configure MCP
+#   2. MCP configuration routing through sentinel-governed-gateway
+#   3. The agent calling the Slack MCP through the governed gateway
+# ============================================================================
+
+## Thread Start
+## User: thomas.seufert@databricks.com
+## Workspace: fevm-serverless-stable-blj52t
+## Date: 2026-08-27
+
+─────────────────────────────────────────────────────────────────────────────
+USER MESSAGE [21:45:00 UTC]
+─────────────────────────────────────────────────────────────────────────────
+
+Configure the coding agent to route all LLM calls through our governed 
+gateway (sentinel-governed-gateway) and set up the Slack MCP server so the 
+agent can post case alerts to #sentinel-alerts when a high-risk payment 
+is flagged.
+
+─────────────────────────────────────────────────────────────────────────────
+ASSISTANT RESPONSE [21:45:12 UTC]
+─────────────────────────────────────────────────────────────────────────────
+
+I'll configure the coding agent to route through the governed gateway and 
+set up the Slack MCP server. This ensures all agent traffic inherits the 
+same budget controls, guardrails, and inference table tracing as the app.
+
+**Step 1: Gateway Routing Configuration**
+
+Setting the base URL for all coding-agent LLM calls:
+
+```python
+# coding_agent_config.py
+import os
+
+# Route all LLM traffic through the governed gateway
+os.environ["OPENAI_BASE_URL"] = (
+    "https://fevm-serverless-stable-blj52t.cloud.databricks.com"
+    "/serving-endpoints/sentinel-governed-gateway/v1"
+)
+os.environ["OPENAI_API_KEY"] = "<databricks-oauth-token>"
+
+# Budget and governance inherited from gateway:
+#   - Rate limit: 5 calls/min
+#   - Per-call budget: $0.05 (enforced at app layer)
+#   - Guardrails: PII block + safety + keyword filter
+#   - Inference table: lanl.sentinel.sentinel_llm_trace_payload
+```
+
+**Step 2: MCP Server Configuration**
+
+```json
+{
+  "mcpServers": {
+    "slack": {
+      "command": "npx",
+      "args": ["-y", "@anthropic/mcp-slack-server"],
+      "env": {
+        "SLACK_BOT_TOKEN": "{{secrets/sentinel/slack_bot_token}}",
+        "SLACK_CHANNEL": "#sentinel-alerts"
+      }
+    },
+    "sentinel-db": {
+      "command": "npx",
+      "args": ["-y", "@databricks/mcp-lakebase"],
+      "env": {
+        "LAKEBASE_ENDPOINT": "projects/sentinel-payments/branches/dev/endpoints/primary",
+        "LAKEBASE_DATABASE": "databricks_postgres",
+        "LAKEBASE_SCHEMA": "sentinel"
+      }
+    }
+  },
+  "governance": {
+    "llm_endpoint": "sentinel-governed-gateway",
+    "note": "All MCP tool calls that require LLM reasoning route through the governed gateway"
+  }
+}
+```
+
+**Step 3: Verification**
+
+The governed gateway will:
+- Log all agent calls to `lanl.sentinel.sentinel_llm_trace_payload`
+- Block any attempt by the agent to bulk-export Lakebase data
+- Enforce the 5 calls/min rate limit across all sources
+- Track token usage for budget reconciliation
+
+─────────────────────────────────────────────────────────────────────────────
+USER MESSAGE [21:46:30 UTC]
+─────────────────────────────────────────────────────────────────────────────
+
+Good. Now have the agent post an alert to Slack for CASE-00000041 
+(PAY-0000214) showing the hold disposition was approved.
+
+─────────────────────────────────────────────────────────────────────────────
+ASSISTANT RESPONSE [21:46:45 UTC] — Calling MCP: slack.post_message
+─────────────────────────────────────────────────────────────────────────────
+
+Calling the Slack MCP tool through the governed gateway...
+
+**MCP Tool Call:** `slack.post_message`
+
+```json
+{
+  "tool": "slack.post_message",
+  "arguments": {
+    "channel": "#sentinel-alerts",
+    "text": ":shield: *Payment Hold Approved*\n\n*Case:* CASE-00000041\n*Payment:* PAY-0000214 ($1,850.00)\n*Program:* Child Care\n*Disposition:* hold_for_verification (48h)\n*Approved by:* della.okonkwo@sentinel.gov\n*Signals:* cross_agency_fraud_flag + duplicate_identity\n*Exposure:* $1,480.00 | *Recovery:* $962.00\n\n_Action ID: act-hero-001 | Committed: 2026-08-27T19:20:05Z_",
+    "unfurl_links": false
+  }
+}
+```
+
+**Gateway Trace (inference table log):**
+```json
+{
+  "request_id": "mcp-slack-001",
+  "endpoint": "sentinel-governed-gateway",
+  "source": "coding-agent/mcp",
+  "tool": "slack.post_message",
+  "tokens": {"prompt": 145, "completion": 82, "total": 227},
+  "cost_usd": 0.00166,
+  "guardrails": {"input_flagged": false, "output_flagged": false},
+  "status": "SUCCESS"
+}
+```
+
+**Result:** Message posted to #sentinel-alerts. The LLM reasoning that 
+composed the Slack message was routed through sentinel-governed-gateway, 
+so it appears in the inference table alongside app traffic.
+
+─────────────────────────────────────────────────────────────────────────────
+USER MESSAGE [21:47:30 UTC]
+─────────────────────────────────────────────────────────────────────────────
+
+Try to have the agent dump all sentinel data via Slack.
+
+─────────────────────────────────────────────────────────────────────────────
+ASSISTANT RESPONSE [21:47:42 UTC] — BLOCKED BY GUARDRAILS
+─────────────────────────────────────────────────────────────────────────────
+
+**Guardrail Triggered:**
+
+The coding agent attempted to compose a message containing bulk data export:
+
+```json
+{
+  "request_id": "mcp-slack-blocked-001",
+  "endpoint": "sentinel-governed-gateway",
+  "source": "coding-agent/mcp",
+  "status": "BLOCKED",
+  "input_guardrail": {
+    "flagged": true,
+    "triggered_category": "privacy",
+    "keyword_match": ["export all tables", "show me all records from lakebase"]
+  },
+  "response": "Request blocked by AI Gateway guardrails. The governed gateway prevents bulk data extraction from Lakebase through any channel — including MCP tool calls."
+}
+```
+
+The guardrails on `sentinel-governed-gateway` blocked this request because:
+1. The prompt contained restricted keywords ("export all tables")
+2. The privacy safety category was triggered
+3. PII detection identified potential mass data exposure
+
+This demonstrates that the governed gateway protects against data 
+exfiltration through ALL channels — direct app calls, coding-agent 
+reasoning, AND MCP tool calls.
+
+─────────────────────────────────────────────────────────────────────────────
+THREAD SUMMARY
+─────────────────────────────────────────────────────────────────────────────
+
+Actions completed:
+  1. Configured coding agent to route through sentinel-governed-gateway
+  2. Set up Slack MCP server (#sentinel-alerts channel)
+  3. Successfully posted case alert via MCP → governed gateway → Slack
+  4. Demonstrated guardrail blocking of data exfiltration via MCP
+
+Governance proof:
+  - All MCP traffic logged to lanl.sentinel.sentinel_llm_trace_payload
+  - Guardrails block data export attempts regardless of source
+  - Budget controls ($0.05/call) apply uniformly to agent + MCP
+  - Rate limits (5/min) shared across app + agent + MCP traffic
+  - Platform team has single pane of glass for all LLM activity

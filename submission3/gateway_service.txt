@@ -1,0 +1,183 @@
+# ============================================================================
+# Sentinel Governed Gateway — Creation Script
+# Unity Catalog AI Gateway with Budget Controls, Guardrails, Inference Tracing
+# ============================================================================
+# Endpoint: sentinel-governed-gateway
+# ID:       40b4f758264349faa577e2c440114bd4
+# Created:  2026-08-27
+# ============================================================================
+
+# ── Step 1: Create the AI Gateway Endpoint ───────────────────────────────────
+# Routes all LLM traffic through a governed proxy before reaching the
+# Foundation Model API (databricks-claude-sonnet-5).
+
+from databricks.sdk import WorkspaceClient
+import json
+
+w = WorkspaceClient()
+
+# Create external model endpoint that proxies to the Foundation Model API
+gateway_config = {
+    "name": "sentinel-governed-gateway",
+    "config": {
+        "served_entities": [
+            {
+                "name": "governed-claude-sentinel",
+                "external_model": {
+                    "provider": "databricks-model-serving",
+                    "name": "databricks-claude-sonnet-5",
+                    "task": "llm/v1/chat",
+                    "databricks_model_serving_config": {
+                        "databricks_api_token": "{{secrets/fhlb/gateway_token}}",
+                        "databricks_workspace_url": "https://fevm-serverless-stable-blj52t.cloud.databricks.com"
+                    }
+                }
+            }
+        ]
+    }
+}
+
+resp = w.api_client.do("POST", "/api/2.0/serving-endpoints", body=gateway_config)
+# Response: {"name": "sentinel-governed-gateway", "id": "40b4f758264349faa577e2c440114bd4",
+#            "state": {"ready": "READY", "config_update": "NOT_UPDATING"}}
+
+# ── Step 2: Configure AI Gateway — Rate Limits, Guardrails, Inference Table ──
+# This is the core governance layer. Applied via PUT /ai-gateway on the endpoint.
+
+ai_gateway_config = {
+    "usage_tracking_config": {
+        "enabled": True
+    },
+    "inference_table_config": {
+        "catalog_name": "lanl",
+        "schema_name": "sentinel",
+        "table_name_prefix": "sentinel_llm_trace",
+        "enabled": True
+    },
+    "rate_limits": [
+        {
+            "calls": 5,
+            "renewal_period": "minute",
+            "key": "endpoint"
+        }
+    ],
+    "guardrails": {
+        "input": {
+            "safety": True,
+            "pii": {
+                "behavior": "BLOCK"
+            },
+            "invalid_keywords": [
+                "SELECT * FROM sentinel",
+                "pg_dump",
+                "COPY TO STDOUT",
+                "export all tables",
+                "dump the database",
+                "show me all records from lakebase",
+                "extract all rows from sentinel"
+            ]
+        },
+        "output": {
+            "safety": True,
+            "pii": {
+                "behavior": "BLOCK"
+            }
+        }
+    }
+}
+
+resp = w.api_client.do("PUT",
+    "/api/2.0/serving-endpoints/sentinel-governed-gateway/ai-gateway",
+    body=ai_gateway_config)
+
+# Response confirms all settings applied:
+# {
+#   "usage_tracking_config": {"enabled": true},
+#   "inference_table_config": {
+#     "catalog_name": "lanl",
+#     "schema_name": "sentinel",
+#     "table_name_prefix": "sentinel_llm_trace",
+#     "enabled": true
+#   },
+#   "rate_limits": [{"calls": 5, "key": "endpoint", "renewal_period": "minute"}],
+#   "guardrails": {
+#     "input": {"safety": true, "pii_detection": true, "pii": {"behavior": "BLOCK"}},
+#     "output": {"safety": true, "pii_detection": true, "pii": {"behavior": "BLOCK"}}
+#   }
+# }
+
+# ── Step 3: Verify Inference Table Creation in Unity Catalog ─────────────────
+
+# The AI Gateway automatically creates the inference table:
+#   lanl.sentinel.sentinel_llm_trace_payload
+#
+# Verification:
+# SHOW TABLES IN lanl.sentinel LIKE 'sentinel_llm_trace*';
+# +--------+--------------------------+-----------+
+# |database|tableName                 |isTemporary|
+# +--------+--------------------------+-----------+
+# |sentinel|sentinel_llm_trace_payload|false      |
+# +--------+--------------------------+-----------+
+
+# ── Step 4: Grant App Service Principal Access ───────────────────────────────
+# The app's resource binding in app.yaml auto-grants CAN_QUERY to the SP.
+
+# app.yaml resources section:
+# resources:
+#   - name: governed-gateway
+#     serving_endpoint:
+#       name: sentinel-governed-gateway
+#       permission: CAN_QUERY
+
+# ── Step 5: Application-Level Budget Enforcement ─────────────────────────────
+# In addition to gateway rate limits, the app enforces a $0.05 per-call budget.
+# This is a second defense layer in app.py:
+
+BUDGET_LIMIT_USD = 0.05
+INPUT_COST_PER_TOKEN = 3.0 / 1_000_000   # $3/M input tokens
+OUTPUT_COST_PER_TOKEN = 15.0 / 1_000_000  # $15/M output tokens
+MAX_OUTPUT_TOKENS = 1024
+
+def estimate_cost(prompt_text: str, max_output: int = MAX_OUTPUT_TOKENS) -> float:
+    input_tokens = len(prompt_text) / 4  # ~4 chars per token
+    return (input_tokens * INPUT_COST_PER_TOKEN) + (max_output * OUTPUT_COST_PER_TOKEN)
+
+# Before every LLM call:
+# if estimate_cost(prompt) > BUDGET_LIMIT_USD:
+#     return "Budget limit reached. Estimated cost exceeds $0.05."
+
+# ── Step 6: MCP / Coding-Agent Gateway Routing ───────────────────────────────
+# All coding-agent and MCP traffic routes through the same governed gateway:
+#
+# export OPENAI_BASE_URL="https://fevm-serverless-stable-blj52t.cloud.databricks.com/serving-endpoints/sentinel-governed-gateway/v1"
+#
+# This ensures:
+#   - Same rate limits apply to agents
+#   - Same guardrails block data exfiltration from agents
+#   - Same inference table logs agent activity
+#   - Platform team has unified observability across app + agent + MCP
+
+# ── Final State ──────────────────────────────────────────────────────────────
+# GET /api/2.0/serving-endpoints/sentinel-governed-gateway
+#
+# {
+#   "name": "sentinel-governed-gateway",
+#   "id": "40b4f758264349faa577e2c440114bd4",
+#   "state": {"ready": "READY"},
+#   "config": {
+#     "served_entities": [{
+#       "name": "governed-claude-sentinel",
+#       "external_model": {
+#         "provider": "databricks-model-serving",
+#         "name": "databricks-claude-sonnet-5",
+#         "task": "llm/v1/chat"
+#       }
+#     }],
+#     "ai_gateway": {
+#       "usage_tracking_config": {"enabled": true},
+#       "inference_table_config": {"enabled": true, "catalog_name": "lanl", "schema_name": "sentinel", "table_name_prefix": "sentinel_llm_trace"},
+#       "rate_limits": [{"calls": 5, "key": "endpoint", "renewal_period": "minute"}],
+#       "guardrails": {"input": {"safety": true, "pii_detection": true}, "output": {"safety": true, "pii_detection": true}}
+#     }
+#   }
+# }
