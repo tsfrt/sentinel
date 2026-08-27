@@ -141,10 +141,19 @@ function makeTools(ctx: AgentContext): Tool[] {
         .nullable()
         .describe('Payment id, e.g. PAY-0000214. Null → return the worst open flagged payment.'),
     }),
-    execute: async () => {
-      throw new Error(
-        'Not implemented — this is your Build 2 Assist task; see APP_WORKSHOP.md',
-      );
+    execute: async ({ payment_id }) => {
+      const { getOpenFlag, worstFlag } = await import('../db/queries/cases.js');
+      const flag = payment_id
+        ? await getOpenFlag(ctx.db, payment_id)
+        : await worstFlag(ctx.db);
+      if (!flag) return { error: 'No open flag found.' };
+      return {
+        payment_id: flag.paymentId,
+        n_signals: flag.nSignals,
+        signal_list: flag.signalList,
+        risk_level: flag.riskLevel,
+        improper_payment_exposure_usd: flag.improperPaymentExposureUsd,
+      };
     },
   });
 
@@ -164,10 +173,18 @@ function makeTools(ctx: AgentContext): Tool[] {
     parameters: z.object({
       payment_id: z.string().describe('Payment id, e.g. PAY-0000214.'),
     }),
-    execute: async () => {
-      throw new Error(
-        'Not implemented — this is your Build 2 Assist task; see APP_WORKSHOP.md',
-      );
+    execute: async ({ payment_id }) => {
+      const { getRecommendation } = await import('../db/queries/cases.js');
+      const rec = await getRecommendation(ctx.db, payment_id);
+      if (!rec) return { error: `No recommendation found for ${payment_id}.` };
+      return {
+        payment_id: rec.paymentId,
+        recommended_disposition: rec.recommendedDisposition,
+        recommended_hold_hours: rec.recommendedHoldHours,
+        predicted_recovery_usd: rec.predictedRecoveryUsd,
+        predicted_cost_usd: rec.predictedCostUsd,
+        action_ranking: rec.actionRanking,
+      };
     },
   });
 
@@ -202,10 +219,40 @@ function makeTools(ctx: AgentContext): Tool[] {
         .number()
         .describe('Predicted recovery for this disposition (from rank_dispositions).'),
     }),
-    execute: async () => {
-      throw new Error(
-        'Not implemented — this is your Build 2/3 Assist/Act task; see APP_WORKSHOP.md',
-      );
+    execute: async ({ payment_id, action_type, hold_duration_hours, drafted_request, predicted_recovery_usd }) => {
+      const { sql } = await import('drizzle-orm');
+      const result = await ctx.db.transaction(async (tx) => {
+        // Insert the approved action into case_actions
+        const res = await tx.execute(sql`
+          INSERT INTO app.case_actions
+            (payment_id, action_type, hold_duration_hours, drafted_request,
+             predicted_recovery_usd, status, approved_by, audit_trail,
+             created_at, decided_at)
+          VALUES (
+            ${payment_id}, ${action_type}, ${hold_duration_hours},
+            ${drafted_request}, ${predicted_recovery_usd},
+            'approved', ${ctx.userEmail},
+            ${JSON.stringify([{
+              action: 'approved',
+              by: ctx.userEmail,
+              at: new Date().toISOString(),
+              note: `Disposition ${action_type} approved via assistant`
+            }])}::jsonb,
+            NOW(), NOW()
+          )
+          RETURNING id, payment_id, action_type, status, created_at
+        `);
+        return res.rows[0];
+      });
+      return {
+        success: true,
+        action_id: (result as any)?.id,
+        payment_id,
+        action_type,
+        status: 'approved',
+        approved_by: ctx.userEmail,
+        message: `Disposition '${action_type}' recorded for ${payment_id}.`
+      };
     },
   });
 
